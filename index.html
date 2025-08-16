@@ -1,0 +1,812 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobilink UK - Parts Cost Management</title>
+    <style>
+        :root {
+            --primary: #000000; /* Black */
+            --secondary: #333;
+            --accent: #ff0000; /* Red */
+            --light: #f8f9fa;
+            --dark: #121212;
+            --success: #ff0000; /* Red */
+            --danger: #ff0000; /* Red */
+            --table-bg: #ffffff; /* White */
+            --table-alt: #f2f2f2; /* Light grey */
+            --table-header: #e6e6e6; /* Grey header */
+        }
+        
+        body {
+            font-family: 'Segoe UI', Roboto, Arial, sans-serif;
+            margin: 0;
+            background-color: #121212; /* Dark background */
+            color: #ffffff; /* White text */
+        }
+        
+        header {
+            background: var(--primary);
+            padding: 15px 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 3px solid var(--accent);
+        }
+        
+        .header-content {
+            flex-grow: 1;
+        }
+        
+        .company-name {
+            font-size: 24px;
+            font-weight: bold;
+            color: #ffffff;
+            margin: 0;
+        }
+        
+        .tagline {
+            font-size: 14px;
+            color: var(--accent);
+            margin: 5px 0 0 0;
+        }
+        
+        .header-right {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .login-header-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .logout-header-btn {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .search-container {
+            display: flex;
+            margin: 15px 0;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        #globalSearch {
+            flex-grow: 1;
+            padding: 10px 15px;
+            border: 1px solid #444;
+            border-radius: 4px 0 0 4px;
+            font-size: 16px;
+            background-color: #222;
+            color: white;
+        }
+        
+        .search-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0 15px;
+            border-radius: 0 4px 4px 0;
+            cursor: pointer;
+        }
+        
+        .controls {
+            display: flex;
+            gap: 10px;
+            padding: 10px 20px;
+            background-color: var(--primary);
+            border-bottom: 1px solid #444;
+        }
+        
+        .btn {
+            padding: 8px 15px;
+            border-radius: 4px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: 1px solid var(--accent);
+        }
+        
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+        
+        .btn-success {
+            background-color: var(--accent);
+            color: white;
+        }
+        
+        main {
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+        
+        details {
+            margin-bottom: 20px;
+            background: #222;
+            border-radius: 5px;
+            border: 1px solid #444;
+            overflow: hidden;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        
+        summary {
+            padding: 12px 20px;
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            user-select: none;
+        }
+        
+        .section-controls {
+            margin-left: auto;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .section-btn {
+            background: rgba(255,0,0,0.2);
+            border: 1px solid var(--accent);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+            font-size: 13px;
+        }
+        
+        /* WHITE/GREY TABLE STYLES */
+        .table-container {
+            padding: 15px;
+            overflow-x: auto;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            background-color: var(--table-bg);
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            color: #333; /* Dark text for table */
+        }
+        
+        th {
+            background-color: var(--table-header);
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+        
+        tbody tr:nth-child(even) {
+            background-color: var(--table-alt);
+        }
+        
+        tbody tr:hover {
+            background-color: #e6e6e6;
+        }
+        
+        .sr {
+            width: 50px;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .actions {
+            width: 120px;
+            text-align: center;
+        }
+        
+        .action-btn {
+            padding: 5px 8px;
+            border-radius: 3px;
+            border: 1px solid #ddd;
+            background: white;
+            cursor: pointer;
+            margin-right: 5px;
+            font-size: 12px;
+            color: #333;
+        }
+        
+        .action-btn.edit {
+            background-color: #f8f9fa;
+            color: var(--primary);
+            border-color: #ccc;
+        }
+        
+        .action-btn.delete {
+            background-color: #f8f9fa;
+            color: var(--danger);
+            border-color: #ccc;
+        }
+        
+        [contenteditable="true"] {
+            background: #ffffff;
+            border: 1px dashed #ccc;
+            padding: 8px 10px;
+            border-radius: 3px;
+            color: #333;
+        }
+        
+        [contenteditable="true"]:focus {
+            outline: none;
+            border: 1px dashed var(--accent);
+            background: white;
+        }
+        
+        .drag-handle {
+            cursor: move;
+            color: var(--accent);
+            padding: 0 10px;
+        }
+        
+        tr.dragging {
+            opacity: 0.5;
+            background: #f0f0f0 !important;
+        }
+        
+        .drop-target {
+            background: #e6f7ff !important;
+        }
+        
+        tr.selected {
+            background-color: #e6f7ff !important;
+            outline: 2px solid var(--accent);
+        }
+        
+        .price-cell::before {
+            content: "£";
+        }
+        
+        /* Login Form Styles */
+        .login-form {
+            display: none;
+            position: absolute;
+            top: 70px;
+            right: 20px;
+            background-color: #222;
+            padding: 20px;
+            border-radius: 8px;
+            width: 300px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            border: 2px solid var(--accent);
+            z-index: 100;
+        }
+        
+        .login-form.show {
+            display: block;
+        }
+        
+        .login-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            border-radius: 4px;
+            border: 1px solid #444;
+            background-color: #333;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .login-submit-btn {
+            width: 100%;
+            padding: 10px;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+        
+        .login-error {
+            color: var(--accent);
+            text-align: center;
+            margin-top: 10px;
+            font-size: 14px;
+            display: none;
+        }
+        
+        @media (max-width: 768px) {
+            .controls {
+                flex-wrap: wrap;
+            }
+            
+            .btn {
+                flex-grow: 1;
+            }
+            
+            header {
+                flex-direction: column;
+                text-align: center;
+            }
+            
+            .header-right {
+                margin-top: 10px;
+                justify-content: center;
+                width: 100%;
+            }
+            
+            .login-form {
+                top: 120px;
+                right: 50%;
+                transform: translateX(50%);
+                width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1 class="company-name">Mobilink UK</h1>
+            <p class="tagline">Tech Repair Experts</p>
+        </div>
+        <div class="header-right">
+            <button id="loginHeaderBtn" class="login-header-btn">Admin Login</button>
+            <button id="logoutHeaderBtn" class="logout-header-btn">Logout</button>
+        </div>
+        
+        <div id="loginForm" class="login-form">
+            <input type="text" id="username" class="login-input" placeholder="Username">
+            <input type="password" id="password" class="login-input" placeholder="Password">
+            <button id="loginBtn" class="login-submit-btn">Login</button>
+            <p id="loginError" class="login-error">Invalid username or password</p>
+        </div>
+    </header>
+    
+    <div class="search-container">
+        <input type="text" id="globalSearch" placeholder="Search by brand, model, category...">
+        <button class="search-btn">Search</button>
+    </div>
+    
+    <div class="controls">
+        <button id="btnAddSection" class="btn btn-primary">Add Section</button>
+        <button id="btnAddRow" class="btn btn-success">Add Row</button>
+        <button id="btnDeleteSelected" class="btn btn-danger">Delete Selected Row</button>
+    </div>
+    
+    <main id="main">
+        <!-- Sections will be populated by JavaScript -->
+    </main>
+
+    <script>
+        // Admin credentials (in a real app, this would be server-side)
+        const ADMIN_CREDENTIALS = {
+            username: "admin",
+            password: "mobilink123"
+        };
+        
+        // Track admin login state
+        let isAdminLoggedIn = false;
+        
+        // Sample initial data structure with £ symbols
+        const initialData = {
+            "iPhone": [
+                { model: "iPhone X", oled: "110", org: "120", pullout: "90", cfFlex: "", housing: "", battery: "50", fCamera: "30", bCamera: "40", flash: "15", charging: "25", unknown: "" },
+                { model: "iPhone 11", oled: "", org: "130", pullout: "", cfFlex: "", housing: "", battery: "55", fCamera: "35", bCamera: "45", flash: "15", charging: "30", unknown: "" }
+            ],
+            "Samsung S Series": [
+                { model: "S20", oled: "150", org: "180", pullout: "120", cfFlex: "", housing: "", battery: "60", fCamera: "40", bCamera: "50", flash: "20", charging: "35", unknown: "" }
+            ],
+            "MacBook": [
+                { model: "MacBook Pro 13\"", oled: "", org: "", pullout: "", cfFlex: "80", housing: "200", battery: "120", fCamera: "40", bCamera: "", flash: "", charging: "60", unknown: "" }
+            ]
+        };
+
+        // Track open sections
+        const openSections = new Set(Object.keys(initialData));
+
+        // Load data from localStorage or use initial data
+        let data = JSON.parse(localStorage.getItem('mobilinkPartsData')) || initialData;
+
+        // Show/hide admin controls based on login state
+        function toggleAdminControls() {
+            const editableCells = document.querySelectorAll('[contenteditable="true"]');
+            const actionButtons = document.querySelectorAll('.action-btn');
+            const controlButtons = document.querySelectorAll('.controls .btn, .section-btn');
+            
+            if (isAdminLoggedIn) {
+                // Enable all editable cells and buttons
+                editableCells.forEach(cell => cell.contentEditable = "true");
+                actionButtons.forEach(btn => btn.style.display = "");
+                controlButtons.forEach(btn => btn.style.display = "");
+                document.getElementById('logoutHeaderBtn').style.display = "";
+                document.getElementById('loginHeaderBtn').style.display = "none";
+                document.getElementById('loginForm').classList.remove('show');
+            } else {
+                // Disable all editable cells and buttons
+                editableCells.forEach(cell => cell.contentEditable = "false");
+                actionButtons.forEach(btn => btn.style.display = "none");
+                controlButtons.forEach(btn => btn.style.display = "none");
+                document.getElementById('logoutHeaderBtn').style.display = "none";
+                document.getElementById('loginHeaderBtn').style.display = "";
+            }
+        }
+
+        // Main rendering function
+        function render() {
+            const mainEl = document.getElementById('main');
+            mainEl.innerHTML = '';
+            
+            Object.entries(data).forEach(([sectionName, rows]) => {
+                const sectionEl = document.createElement('details');
+                sectionEl.dataset.section = sectionName;
+                
+                // Keep section open if it was previously open
+                sectionEl.open = openSections.has(sectionName);
+                
+                sectionEl.innerHTML = `
+                    <summary>
+                        ${sectionName}
+                        <div class="section-controls">
+                            <button class="section-btn add-row" data-section="${sectionName}">Add Row</button>
+                            <button class="section-btn delete-section" data-section="${sectionName}">Delete Section</button>
+                        </div>
+                    </summary>
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th class="sr">#</th>
+                                    <th>Model</th>
+                                    <th>OLED</th>
+                                    <th>ORG</th>
+                                    <th>PULLOUT</th>
+                                    <th>C/FLEX</th>
+                                    <th>B-G/HOUSING</th>
+                                    <th>BATTERY</th>
+                                    <th>F CAMERA</th>
+                                    <th>B CAMERA</th>
+                                    <th>FLASH</th>
+                                    <th>CHARGING</th>
+                                    <th>COMMENTS</th>
+                                    <th class="actions">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${rows.map((row, index) => `
+                                    <tr draggable="true" data-section="${sectionName}" data-index="${index}">
+                                        <td class="sr">${index + 1}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="model">${row.model}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="oled" class="price-cell">${row.oled}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="org" class="price-cell">${row.org}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="pullout" class="price-cell">${row.pullout}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="cfFlex" class="price-cell">${row.cfFlex}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="housing" class="price-cell">${row.housing}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="battery" class="price-cell">${row.battery}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="fCamera" class="price-cell">${row.fCamera}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="bCamera" class="price-cell">${row.bCamera}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="flash" class="price-cell">${row.flash}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="charging" class="price-cell">${row.charging}</td>
+                                        <td contenteditable="${isAdminLoggedIn}" data-field="unknown" class="price-cell">${row.unknown}</td>
+                                        <td class="actions">
+                                            <button class="action-btn edit" ${isAdminLoggedIn ? '' : 'style="display:none"'}>Edit</button>
+                                            <button class="action-btn delete" ${isAdminLoggedIn ? '' : 'style="display:none"'}>Delete</button>
+                                            <span class="drag-handle" ${isAdminLoggedIn ? '' : 'style="display:none"'}>☰</span>
+                                        </td>
+                                    </tr>
+                                `).join('')}
+                            </tbody>
+                        </table>
+                    </div>
+                `;
+                
+                // Track section open/close state
+                sectionEl.querySelector('summary').addEventListener('click', function() {
+                    if (sectionEl.open) {
+                        openSections.add(sectionName);
+                    } else {
+                        openSections.delete(sectionName);
+                    }
+                });
+                
+                mainEl.appendChild(sectionEl);
+            });
+            
+            attachEventListeners();
+            toggleAdminControls();
+        }
+
+        // Attach all event listeners
+        function attachEventListeners() {
+            // Editable cells
+            document.querySelectorAll('[contenteditable="true"]').forEach(cell => {
+                cell.addEventListener('blur', function() {
+                    if (!isAdminLoggedIn) return;
+                    
+                    const section = this.closest('tr').dataset.section;
+                    const index = this.closest('tr').dataset.index;
+                    const field = this.dataset.field;
+                    let newValue = this.textContent.trim();
+                    
+                    // Remove £ symbol if user added it manually
+                    if (this.classList.contains('price-cell')) {
+                        newValue = newValue.replace(/£/g, '');
+                    }
+                    
+                    data[section][index][field] = newValue;
+                    saveData();
+                    
+                    // Update display with £ symbol
+                    if (this.classList.contains('price-cell')) {
+                        this.textContent = newValue === '' ? '' : newValue;
+                    }
+                });
+                
+                cell.addEventListener('keydown', function(e) {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        this.blur();
+                    }
+                });
+            });
+            
+            // Row drag and drop
+            let draggedRow = null;
+            
+            document.querySelectorAll('tbody tr').forEach(row => {
+                row.addEventListener('dragstart', function(e) {
+                    if (!isAdminLoggedIn) {
+                        e.preventDefault();
+                        return;
+                    }
+                    draggedRow = this;
+                    this.classList.add('dragging');
+                    e.dataTransfer.effectAllowed = 'move';
+                });
+                
+                row.addEventListener('dragend', function() {
+                    this.classList.remove('dragging');
+                });
+                
+                row.addEventListener('dragover', function(e) {
+                    if (!isAdminLoggedIn) return;
+                    e.preventDefault();
+                    if (draggedRow && draggedRow !== this) {
+                        const rect = this.getBoundingClientRect();
+                        const midY = rect.top + rect.height / 2;
+                        
+                        if (e.clientY > midY) {
+                            this.parentNode.insertBefore(draggedRow, this.nextSibling);
+                        } else {
+                            this.parentNode.insertBefore(draggedRow, this);
+                        }
+                    }
+                });
+                
+                row.addEventListener('drop', function(e) {
+                    if (!isAdminLoggedIn) return;
+                    e.preventDefault();
+                    if (draggedRow) {
+                        const section = this.closest('details').dataset.section;
+                        const fromIndex = parseInt(draggedRow.dataset.index);
+                        const toIndex = parseInt(this.dataset.index);
+                        
+                        // Reorder data array
+                        const [movedRow] = data[section].splice(fromIndex, 1);
+                        data[section].splice(toIndex, 0, movedRow);
+                        
+                        saveData();
+                        render();
+                    }
+                });
+            });
+            
+            // Section controls
+            document.querySelectorAll('.add-row').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (!isAdminLoggedIn) return;
+                    
+                    const section = this.dataset.section;
+                    data[section].push({
+                        model: "New Model",
+                        oled: "",
+                        org: "",
+                        pullout: "",
+                        cfFlex: "",
+                        housing: "",
+                        battery: "",
+                        fCamera: "",
+                        bCamera: "",
+                        flash: "",
+                        charging: "",
+                        unknown: ""
+                    });
+                    saveData();
+                    render();
+                });
+            });
+            
+            document.querySelectorAll('.delete-section').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    if (!isAdminLoggedIn) return;
+                    
+                    const section = this.dataset.section;
+                    if (confirm(`Delete entire ${section} section?`)) {
+                        delete data[section];
+                        openSections.delete(section);
+                        saveData();
+                        render();
+                    }
+                });
+            });
+            
+            // Global controls
+            document.getElementById('btnAddSection').addEventListener('click', function() {
+                if (!isAdminLoggedIn) return;
+                
+                const sectionName = prompt("Enter new section name:");
+                if (sectionName && !data[sectionName]) {
+                    data[sectionName] = [];
+                    openSections.add(sectionName);
+                    saveData();
+                    render();
+                } else if (sectionName && data[sectionName]) {
+                    alert("Section already exists!");
+                }
+            });
+            
+            document.getElementById('btnAddRow').addEventListener('click', function() {
+                if (!isAdminLoggedIn) return;
+                
+                const sections = Object.keys(data);
+                if (sections.length === 0) {
+                    alert("Please create a section first");
+                    return;
+                }
+                
+                const section = sections[0]; // Add to first section by default
+                data[section].push({
+                    model: "New Model",
+                    oled: "",
+                    org: "",
+                    pullout: "",
+                    cfFlex: "",
+                    housing: "",
+                    battery: "",
+                    fCamera: "",
+                    bCamera: "",
+                    flash: "",
+                    charging: "",
+                    unknown: ""
+                });
+                saveData();
+                render();
+            });
+            
+            document.getElementById('btnDeleteSelected').addEventListener('click', function() {
+                if (!isAdminLoggedIn) return;
+                
+                const selected = document.querySelector('tr.selected');
+                if (selected) {
+                    const section = selected.dataset.section;
+                    const index = selected.dataset.index;
+                    
+                    if (confirm("Delete this row?")) {
+                        data[section].splice(index, 1);
+                        saveData();
+                        render();
+                    }
+                } else {
+                    alert("Please select a row first");
+                }
+            });
+            
+            // Row selection
+            document.querySelectorAll('tbody tr').forEach(row => {
+                row.addEventListener('click', function() {
+                    document.querySelectorAll('tr.selected').forEach(r => r.classList.remove('selected'));
+                    this.classList.add('selected');
+                });
+            });
+            
+            // Search functionality
+            document.getElementById('globalSearch').addEventListener('input', function() {
+                const query = this.value.trim().toLowerCase();
+                
+                document.querySelectorAll('tbody tr').forEach(row => {
+                    if (row.querySelectorAll('td').length <= 1) return; // Skip header rows
+                    
+                    const text = Array.from(row.querySelectorAll('td')).slice(1, -1)
+                        .map(td => td.textContent.toLowerCase())
+                        .join(' ');
+                    
+                    row.style.display = text.includes(query) ? '' : 'none';
+                });
+            });
+            
+            // Login button in header
+            document.getElementById('loginHeaderBtn').addEventListener('click', function() {
+                document.getElementById('loginForm').classList.toggle('show');
+            });
+            
+            // Login button in form
+            document.getElementById('loginBtn').addEventListener('click', function() {
+                const username = document.getElementById('username').value;
+                const password = document.getElementById('password').value;
+                
+                if (username === ADMIN_CREDENTIALS.username && password === ADMIN_CREDENTIALS.password) {
+                    isAdminLoggedIn = true;
+                    document.getElementById('loginError').style.display = 'none';
+                    document.getElementById('username').value = '';
+                    document.getElementById('password').value = '';
+                    render();
+                } else {
+                    document.getElementById('loginError').style.display = 'block';
+                }
+            });
+            
+            // Logout button
+            document.getElementById('logoutHeaderBtn').addEventListener('click', function() {
+                isAdminLoggedIn = false;
+                render();
+            });
+            
+            // Close login form when clicking outside
+            document.addEventListener('click', function(e) {
+                const loginForm = document.getElementById('loginForm');
+                const loginBtn = document.getElementById('loginHeaderBtn');
+                
+                if (!loginForm.contains(e.target) && e.target !== loginBtn) {
+                    loginForm.classList.remove('show');
+                }
+            });
+        }
+
+        // Save data to localStorage
+        function saveData() {
+            localStorage.setItem('mobilinkPartsData', JSON.stringify(data));
+        }
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', function(e) {
+            // Focus search on "/"
+            if (e.key === '/' && document.activeElement !== document.getElementById('globalSearch')) {
+                e.preventDefault();
+                document.getElementById('globalSearch').focus();
+            }
+            
+            // Save with Ctrl+S
+            if ((e.ctrlKey || e.metaKey) && e.key === 's') {
+                e.preventDefault();
+                saveData();
+                alert('Data saved successfully');
+            }
+        });
+
+        // Initial render
+        document.addEventListener('DOMContentLoaded', function() {
+            render();
+        });
+    </script>
+</body>
+</html>
